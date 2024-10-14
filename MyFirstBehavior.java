@@ -26,12 +26,14 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	double gunHeat;
 	double height;
 	double width;
+	double gunTurn;
 	List <Point> lastandcurrentpos = createEmptyList();
 	//java.awt.Graphics2D canvas = getGraphics();
+	boolean locked = false;
 
 	@Override
 	public void start() {
-
+		java.awt.Graphics2D canvas = getGraphics();
 		for (int i = 1; i <= 2; i++){
 			lastandcurrentpos = insertBack(lastandcurrentpos, getPoint());
 		}
@@ -45,11 +47,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	}
 
 	@Override
-	public Graphics2D getGraphics() {
-		return super.getGraphics();
-	}
-
-	@Override
 	void execute() {
 		gunHeat = getGunHeat();
 		if (hasScannedRobot()) {
@@ -57,7 +54,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			distance = getDistance(ev);
 			double deg = getBearing(ev) + getHeading();
 			double radarTurn = normalRelativeAngle(deg - getRadarHeading());
-			double gunTurn = normalRelativeAngle(deg - getGunHeading());
+			gunTurn = normalRelativeAngle(deg - getGunHeading());
 			turnRadar(radarTurn * 1.10);
 			turnGun(gunTurn);
 			relativeEnemyPosition = pointFromPolarCoordinates(deg, distance);
@@ -72,16 +69,21 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			turnRadar(-360);
 		}
 		lastdistance = subtract(getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
-		//double lastdistancelength = length(lastdistance);
+		double lastdistancelength = length(lastdistance); //geschw. des gegners
 		Point absolute = add(getLast(lastandcurrentpos), lastdistance);
-		Point relative = subtract(absolute, getX(), getY());
-		paintDot(relative, RED);
-		double adjust = angleBetween(relative, getLast(lastandcurrentpos));
-		adjust = normalRelativeAngle(adjust);
-		debug("-------preiam--------");
+		Point us = pointFromCoordinates(getX(), getY());
+		Point relative = subtract(absolute, us);
+		//paintDot(relative, RED);
+		//paintDot(absolute, YELLOW);
+		//paintDot(getLast(lastandcurrentpos), BLUE);
+		paintLine(getPoint(), getLast(lastandcurrentpos), RED);
+		paintLine(getPoint(), absolute, YELLOW);
+		paintLine(getLast(lastandcurrentpos), absolute, BLUE);
+		double adjust = angleBetween(getLast(lastandcurrentpos), us);
+		//adjust = normalRelativeAngle(adjust);
+		debug("-------preaim--------");
 		debug(String.valueOf(adjust));
-		debug("---------------------");
-		turnGun(adjust);
+		debug("-----------------------------");
 
 		circle(distance);
 		if (distance < 200) {
