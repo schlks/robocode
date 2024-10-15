@@ -130,4 +130,17 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			ahead(dist);
 		}
 	}
+
+	// noch absolut gar nicht richtig aber wir haben schon eien weg dahin
+	void aimbot(double v_enemy, double v_bullet, Point pos_enemy) {
+		for (int t=1; t<=15; t++) {
+			Point new_pos_enemy = multiply(add(pos_enemy, vel_enemy), t);/* Richtung beachten */
+			double angle = magic_calc_angle_func; // von oben
+			Point pos_bullet = multiply(add(getPoint(), vel_bullet), t); /* Richtung beachten */
+			// hitbox nachgucken
+			if ((new_pos_enemy - radius_hitbox) <= new_pos_bullet && new_pos_bullet <= (new_pos_enemy + radius_hitbox)) {
+				fireBullet(3);
+			}
+		}
+	}
 }
