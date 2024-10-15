@@ -68,6 +68,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		} else {
 			turnRadar(-360);
 		}
+		/*
 		lastdistance = subtract(getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		double lastdistancelength = length(lastdistance); //geschw. des gegners
 		Point absolute = add(getLast(lastandcurrentpos), lastdistance);
@@ -87,21 +88,68 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			adjust -= 360;
 		}
 		adjust = normalRelativeAngle(adjust);
-		debug("-------preaim--------");
-		debug(String.valueOf(adjust));
-		debug("---------------------");
-
-		turnGun(adjust);
+		 */
+		//Point lastdistance = subtract(getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
+		//double power = 2;
+		//aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
+		//debug("-------preaim--------");
+		//debug(String.valueOf(adjust));
+		//debug("---------------------");
+		double power = 0;
+		//turnGun(adjust);
 		circle(distance);
-		if (distance < 200) {
-			double vel = 20 - 3 * 3;
-			fireBullet(3);
-		} else if (distance > 200 && distance < 500) {
-			fireBullet(2);
+		if (distance <= 200) {
+			power = 3;
+		} else if (distance > 200 && distance <= 400) {
+			power = 2;
+		}else if (distance > 400 && distance > 600) {
+			power = 1;
 		} else {
-			fireBullet(1);
+			power = 0.5;
 		}
-		debug("["+getFirst(lastandcurrentpos)+", "+getLast(lastandcurrentpos)+"]");
+		aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
+		fireBullet(power);
+		//debug("["+getFirst(lastandcurrentpos)+", "+getLast(lastandcurrentpos)+"]");
+	}
+
+	double preaimAngle(Point current, Point distance) {
+		double distancelength = length(distance);
+		//Point absolute = add(current, distance);
+		Point absolute = distance;
+		paintLine(getPoint(), current, RED);
+		paintLine(getPoint(), absolute, YELLOW);
+		paintLine(current, absolute, BLUE);
+		double angle = angleBetween(current, getPoint());
+		angle = angle - getGunHeading();
+		if (angle >= -360 && angle < 0) {
+			angle += 360;
+		} else if (angle <= 360 && angle > 0) {
+			angle -= 360;
+		}
+		angle = normalRelativeAngle(angle);
+		return angle;
+	}
+
+	// noch absolut gar nicht richtig aber wir haben schon einen weg dahin
+	void aimbot(double power, Point posEnemy, Point lastPosEnemy) {
+		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
+		double velEnemy = length(enemyDistanceTravl);
+		double velBullet = 20 - 3 * power;
+		double limit = distance / velBullet + 2;
+		debug(String.valueOf((int)limit));
+		for (int t=1; t<=(int)limit; t++) {
+			Point newPosEnemy = add(posEnemy, enemyDistanceTravl);/* Richtung beachten */
+			double angle = preaimAngle(posEnemy, newPosEnemy);
+			//Point posBullet = multiply(add(getPoint(), velBullet), t); /* Richtung beachten */
+			// hitbox nachgucken
+			turnGun(angle);
+			posEnemy = newPosEnemy;
+			/*
+			if ((newPosEnemy - radius_hitbox) <= newPosBullet && newPosBullet <= (newPosEnemy + radius_hitbox)) {
+				fireBullet(power);
+			}
+			 */
+		}
 	}
 
 	void circle(double distance) {
@@ -110,10 +158,11 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		double limit = 100;
 		double X = getX();
 		double Y = getY();
-		debug(String.valueOf(X));
-		debug(String.valueOf(Y));
-		debug(String.valueOf(height-Y));
-		debug(String.valueOf(width-X));
+		ahead(dist);
+		turn(deg);
+		//debug(String.valueOf(X));
+		//debug(String.valueOf(Y));
+		/*
 		if (height - Y <= limit || Y <= limit) {
 			ahead(-200);
 			neg = true;
@@ -129,18 +178,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			turn(deg);
 			ahead(dist);
 		}
-	}
 
-	// noch absolut gar nicht richtig aber wir haben schon eien weg dahin
-	void aimbot(double v_enemy, double v_bullet, Point pos_enemy) {
-		for (int t=1; t<=15; t++) {
-			Point new_pos_enemy = multiply(add(pos_enemy, vel_enemy), t);/* Richtung beachten */
-			double angle = magic_calc_angle_func; // von oben
-			Point pos_bullet = multiply(add(getPoint(), vel_bullet), t); /* Richtung beachten */
-			// hitbox nachgucken
-			if ((new_pos_enemy - radius_hitbox) <= new_pos_bullet && new_pos_bullet <= (new_pos_enemy + radius_hitbox)) {
-				fireBullet(3);
-			}
-		}
+		 */
 	}
 }
