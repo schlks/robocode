@@ -1,8 +1,7 @@
 package infovk.l_schepp24;
 
-import java.awt.*;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
+import java.util.Timer;
 
 import static infovk.l_schepp24.Wrappers.*;
 import static infovk.l_schepp24.Utils.*;
@@ -28,8 +27,9 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	double width;
 	double gunTurn;
 	List <Point> lastandcurrentpos = createEmptyList();
+	List count = createEmptyList();
 	//java.awt.Graphics2D canvas = getGraphics();
-	boolean locked = false;
+	boolean neg = false;
 
 	@Override
 	public void start() {
@@ -80,11 +80,18 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		paintLine(getPoint(), absolute, YELLOW);
 		paintLine(getLast(lastandcurrentpos), absolute, BLUE);
 		double adjust = angleBetween(getLast(lastandcurrentpos), us);
-		//adjust = normalRelativeAngle(adjust);
+		adjust = adjust - getGunHeading();
+		if (adjust >= -360 && adjust < 0) {
+			adjust += 360;
+		} else if (adjust <= 360 && adjust > 0 ) {
+			adjust -= 360;
+		}
+		adjust = normalRelativeAngle(adjust);
 		debug("-------preaim--------");
 		debug(String.valueOf(adjust));
-		debug("-----------------------------");
+		debug("---------------------");
 
+		turnGun(adjust);
 		circle(distance);
 		if (distance < 200) {
 			double vel = 20 - 3 * 3;
@@ -105,15 +112,22 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		double Y = getY();
 		debug(String.valueOf(X));
 		debug(String.valueOf(Y));
+		debug(String.valueOf(height-Y));
+		debug(String.valueOf(width-X));
 		if (height - Y <= limit || Y <= limit) {
 			ahead(-200);
-			turn(-deg);
+			neg = true;
 		} else if (width - X <= limit || X <= limit) {
 			ahead(-200);
-			turn(-deg);
+			neg = true;
+		}
+		if (neg) {
+			turn((deg+20)*-1);
+			ahead(-dist);
+			neg = false;
 		} else {
-			ahead(dist);
 			turn(deg);
+			ahead(dist);
 		}
 	}
 }
