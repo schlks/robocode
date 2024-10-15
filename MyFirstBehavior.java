@@ -100,17 +100,20 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	void circle(double distance) {
 		int dist = 20;
 		int deg = 50;
-		if (hasHitWall()) {
-			HitWallEvent hit = getHitWallEvent();
-			ahead(-dist);
+		double limit = 100;
+		double X = getX();
+		double Y = getY();
+		debug(String.valueOf(X));
+		debug(String.valueOf(Y));
+		if (height - Y <= limit || Y <= limit) {
+			ahead(-200);
+			turn(-deg);
+		} else if (width - X <= limit || X <= limit) {
+			ahead(-200);
+			turn(-deg);
 		} else {
 			ahead(dist);
-		}
-		ahead(dist);
-		if (distance > 300) {
 			turn(deg);
-		} else {
-			turn(-deg);
 		}
 	}
 }
