@@ -29,7 +29,9 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	List <Point> lastandcurrentpos = createEmptyList();
 	//List count = createEmptyList();
 	//java.awt.Graphics2D canvas = getGraphics();
+	Point newPoint = new Point(width/2, height/2);
 	boolean neg = false;
+	double cooldown = 0;
 
 	@Override
 	public void start() {
@@ -68,27 +70,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		} else {
 			turnRadar(-360);
 		}
-		/*
-		lastdistance = subtract(getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
-		double lastdistancelength = length(lastdistance); //geschw. des gegners
-		Point absolute = add(getLast(lastandcurrentpos), lastdistance);
-		Point us = pointFromCoordinates(getX(), getY());
-		Point relative = subtract(absolute, us);
-		//paintDot(relative, RED);
-		//paintDot(absolute, YELLOW);
-		//paintDot(getLast(lastandcurrentpos), BLUE);
-		paintLine(getPoint(), getLast(lastandcurrentpos), RED);
-		paintLine(getPoint(), absolute, YELLOW);
-		paintLine(getLast(lastandcurrentpos), absolute, BLUE);
-		double adjust = angleBetween(getLast(lastandcurrentpos), us);
-		adjust = adjust - getGunHeading();
-		if (adjust >= -360 && adjust < 0) {
-			adjust += 360;
-		} else if (adjust <= 360 && adjust > 0 ) {
-			adjust -= 360;
-		}
-		adjust = normalRelativeAngle(adjust);
-		 */
 		//Point lastdistance = subtract(getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		//double power = 2;
 		//aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
@@ -138,42 +119,42 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		Point newPosEnemy = add(posEnemy, multiply(enemyDistanceTravl, ticksToEnemy));
 		double angle = preaimAngle(posEnemy, newPosEnemy);
 		turnGun(angle);
-		debug(String.valueOf(angle));
+		//debug(String.valueOf(angle));
 		return angle;
 	}
 
 	// noch absolut gar nicht richtig aber wir haben schon einen weg dahin
 	void aimbot(double power, Point posEnemy, Point lastPosEnemy) {
-		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
+		Point enemyDistanceTravl = subtract(lastPosEnemy, posEnemy);
 		double velEnemy = length(enemyDistanceTravl);
 		double velBullet = 20 - 3 * power;
 		double limit = distance / velBullet;
-		debug(String.valueOf((int)limit));
+		//debug(String.valueOf((int)limit));
+		Point ownPos = getPoint();
 		Point newPosEnemy = pointFromCoordinates(0, 0);
 		double angle = 0;
 		for (int t=1; t<=(int)limit; t++) {
 			newPosEnemy = add(posEnemy, enemyDistanceTravl);/* Richtung beachten */
-			//Point posBullet = multiply(add(getPoint(), velBullet), t); /* Richtung beachten */
+			Point vecToEnemy = subtract(ownPos, newPosEnemy);
+			Point newPosBullet = add(ownPos, multiply(normalize(vecToEnemy), velBullet*t)); /* Richtung beachten */
 			// hitbox nachgucken
-			angle = preaimAngle(posEnemy, newPosEnemy);
 			posEnemy = newPosEnemy;
 
-			/*
-			if ((newPosEnemy - radius_hitbox) <= newPosBullet && newPosBullet <= (newPosEnemy + radius_hitbox)) {
-				fireBullet(power);
-			}
-			 */
+			//if ((distance(newPosBullet, newPosEnemy) < 26 )) {
+			//	turnGun();
+			//	fireBullet(power);
+			//}
 		}
-		Point relative = subtract(newPosEnemy, getPoint());
-		double length = length(relative);
-		double newTicks = length / velBullet;
+		//angle = preaimAngle(posEnemy, newPosEnemy);
+		double newDistance = distance(newPosEnemy, getPoint());
+		double newTicks = newDistance / velBullet;
 		double newLimit = newTicks - limit;
 
 		for (int t = 0; t <= (int)newLimit; t++) {
 			newPosEnemy = add(posEnemy, enemyDistanceTravl);
-			angle = preaimAngle(posEnemy, newPosEnemy);
 			posEnemy = newPosEnemy;
 		}
+		angle = preaimAngle(posEnemy, newPosEnemy);
 		//debug(String.valueOf(length));
 		//debug(String.valueOf(newLimit));
 		turnGun(angle);
@@ -185,27 +166,31 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		double limit = 100;
 		double X = getX();
 		double Y = getY();
-		ahead(dist);
-		turn(deg);
 		//debug(String.valueOf(X));
 		//debug(String.valueOf(Y));
-		/*
+
 		if (height - Y <= limit || Y <= limit) {
 			ahead(-200);
 			neg = true;
+			cooldown = getTime() + 5;
+			debug("cooldown:"+String.valueOf(cooldown));
 		} else if (width - X <= limit || X <= limit) {
 			ahead(-200);
 			neg = true;
+			cooldown = getTime() + 5;
+			debug("cooldown: "+String.valueOf(cooldown));
 		}
-		if (neg) {
-			turn((deg+20)*-1);
+		if (neg && getTime() <= cooldown) {
+			turn(deg+20);
 			ahead(-dist);
-			neg = false;
+			if (getTime() == cooldown) {
+				neg = false;
+			}
 		} else {
 			turn(deg);
 			ahead(dist);
 		}
 
-		 */
+
 	}
 }
