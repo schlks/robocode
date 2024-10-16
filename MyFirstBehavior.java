@@ -166,11 +166,11 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		//debug(String.valueOf(Y));
 
 		if (height - Y <= limit || Y <= limit) {
-			ahead(-200);
+			//ahead(-200);
 			neg = true;
 			cooldown = getTime() + 5;
 		} else if (width - X <= limit || X <= limit) {
-			ahead(-200);
+			//ahead(-200);
 			neg = true;
 			cooldown = getTime() + 5;
 		}
@@ -180,8 +180,10 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 				turn(angleBetween(middle, getPoint())); //muss sich zur mitte der map drehen
 			}*/
 			ahead(direction * -20);
+
 			if (getTime() == cooldown) {
 				neg = false;
+				direction *= -1;
 			}
 		} else {
 			turn(normalRelativeAngle(bearing - 90) * turnDirection);
@@ -190,13 +192,10 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		/*
 		if (velocity == 0) {
 			turn(bearing + 90);
+			if (getTime() % 30 == 0) {
+				direction *= -1;
+			}
 		}
 		*/
-		if (getTime() % 30 == 0) {
-			direction *= -1;
-		}
-		if (getTime() % 50 == 0) {
-			turnDirection *= -1;
-		}
 	}
 }
