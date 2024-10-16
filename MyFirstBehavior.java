@@ -32,6 +32,8 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	Point newPoint = new Point(width/2, height/2);
 	boolean neg = false;
 	double cooldown = 0;
+	double velocity = 0;
+	double bearing = 0;
 
 	@Override
 	public void start() {
@@ -54,7 +56,9 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		if (hasScannedRobot()) {
 			ScannedRobotEvent ev = getScannedRobotEvent();
 			distance = getDistance(ev);
-			double deg = getBearing(ev) + getHeading();
+			velocity = Wrappers.getVelocity(ev);
+			bearing = getBearing(ev);
+			double deg = bearing + getHeading();
 			double radarTurn = normalRelativeAngle(deg - getRadarHeading());
 			gunTurn = normalRelativeAngle(deg - getGunHeading());
 			turnRadar(radarTurn * 1.10);
@@ -125,18 +129,18 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 
 	// noch absolut gar nicht richtig aber wir haben schon einen weg dahin
 	void aimbot(double power, Point posEnemy, Point lastPosEnemy) {
-		Point enemyDistanceTravl = subtract(lastPosEnemy, posEnemy);
+		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
 		double velEnemy = length(enemyDistanceTravl);
 		double velBullet = 20 - 3 * power;
 		double limit = distance / velBullet;
 		//debug(String.valueOf((int)limit));
-		Point ownPos = getPoint();
+		//   Point ownPos = getPoint();
 		Point newPosEnemy = pointFromCoordinates(0, 0);
 		double angle = 0;
 		for (int t=1; t<=(int)limit; t++) {
 			newPosEnemy = add(posEnemy, enemyDistanceTravl);/* Richtung beachten */
-			Point vecToEnemy = subtract(ownPos, newPosEnemy);
-			Point newPosBullet = add(ownPos, multiply(normalize(vecToEnemy), velBullet*t)); /* Richtung beachten */
+			//   Point vecToEnemy = subtract(ownPos, newPosEnemy);
+			//   Point newPosBullet = add(ownPos, multiply(normalize(vecToEnemy), velBullet*t)); /* Richtung beachten */
 			// hitbox nachgucken
 			posEnemy = newPosEnemy;
 
@@ -145,7 +149,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			//	fireBullet(power);
 			//}
 		}
-		//angle = preaimAngle(posEnemy, newPosEnemy);
 		double newDistance = distance(newPosEnemy, getPoint());
 		double newTicks = newDistance / velBullet;
 		double newLimit = newTicks - limit;
@@ -155,8 +158,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			posEnemy = newPosEnemy;
 		}
 		angle = preaimAngle(posEnemy, newPosEnemy);
-		//debug(String.valueOf(length));
-		//debug(String.valueOf(newLimit));
 		turnGun(angle);
 	}
 
@@ -190,7 +191,5 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			turn(deg);
 			ahead(dist);
 		}
-
-
 	}
 }
