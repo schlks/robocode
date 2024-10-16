@@ -162,17 +162,18 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		double limit = 100;
 		double X = getX();
 		double Y = getY();
+		double b = 1;
 		//debug(String.valueOf(X));
 		//debug(String.valueOf(Y));
 
 		if (height - Y <= limit || Y <= limit) {
 			//ahead(-200);
 			neg = true;
-			cooldown = getTime() + 5;
+			cooldown = getTime() + 3;
 		} else if (width - X <= limit || X <= limit) {
 			//ahead(-200);
 			neg = true;
-			cooldown = getTime() + 5;
+			cooldown = getTime() + 3;
 		}
 		if (neg && getTime() <= cooldown) {
 			/*if (angleBetween(middle, getPoint()) != getHeading()) {
@@ -186,7 +187,12 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 				direction *= -1;
 			}
 		} else {
-			turn(normalRelativeAngle(bearing - 90) * turnDirection);
+			if (distance > 300) {
+				b = 50;
+			} else if (distance < 300) {
+				b = -50;
+			}
+			turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
 			ahead(direction * 20);
 		}
 		/*
