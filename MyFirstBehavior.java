@@ -82,12 +82,14 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			power = 3;
 		} else if (distance > 200 && distance <= 400) {
 			power = 2;
-		}else if (distance > 400 && distance > 600) {
+		}else if (distance > 400 && distance <= 600) {
 			power = 1;
 		} else {
 			power = 0.5;
 		}
-		aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
+		if (getVelocity() != 0) {
+			aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
+		}
 		//dreieck(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		fireBullet(power);
 	}
@@ -169,22 +171,24 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		if (height - Y <= limit || Y <= limit) {
 			//ahead(-200);
 			neg = true;
-			cooldown = getTime() + 3;
+			cooldown = getTime() + 7;
 		} else if (width - X <= limit || X <= limit) {
 			//ahead(-200);
 			neg = true;
-			cooldown = getTime() + 3;
+			cooldown = getTime() + 7;
 		}
 		if (neg && getTime() <= cooldown) {
 			/*if (angleBetween(middle, getPoint()) != getHeading()) {
 				debug(String.valueOf(angleBetween(middle, getPoint())));
 				turn(angleBetween(middle, getPoint())); //muss sich zur mitte der map drehen
 			}*/
-			ahead(direction * -20);
+			ahead(direction * -10);
+			//turn(normalRelativeAngle(bearing - 90) * -1);
 
 			if (getTime() == cooldown) {
 				neg = false;
 				direction *= -1;
+				//turnDirection *= -1;
 			}
 		} else {
 			if (distance > 300) {
@@ -192,16 +196,20 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			} else if (distance < 300) {
 				b = -50;
 			}
+			if (hasHitWall()) {
+				direction *= -1;
+			}
+			debug(String.valueOf(direction));
 			turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
 			ahead(direction * 20);
 		}
-		/*
+
 		if (velocity == 0) {
 			turn(bearing + 90);
 			if (getTime() % 30 == 0) {
 				direction *= -1;
 			}
 		}
-		*/
+
 	}
 }
