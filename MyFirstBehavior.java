@@ -27,7 +27,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	double width;
 	double gunTurn;
 	List <Point> lastandcurrentpos = createEmptyList();
-	List count = createEmptyList();
+	//List count = createEmptyList();
 	//java.awt.Graphics2D canvas = getGraphics();
 	boolean neg = false;
 
@@ -108,6 +108,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			power = 0.5;
 		}
 		aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
+		//dreieck(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		fireBullet(power);
 		//debug("["+getFirst(lastandcurrentpos)+", "+getLast(lastandcurrentpos)+"]");
 	}
@@ -130,26 +131,52 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		return angle;
 	}
 
+	double dreieck(double power, Point posEnemy, Point lastPosEnemy) {
+		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
+		double velBullet = 20 - 3 * power;
+		double ticksToEnemy = distance / velBullet;
+		Point newPosEnemy = add(posEnemy, multiply(enemyDistanceTravl, ticksToEnemy));
+		double angle = preaimAngle(posEnemy, newPosEnemy);
+		turnGun(angle);
+		debug(String.valueOf(angle));
+		return angle;
+	}
+
 	// noch absolut gar nicht richtig aber wir haben schon einen weg dahin
 	void aimbot(double power, Point posEnemy, Point lastPosEnemy) {
 		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
 		double velEnemy = length(enemyDistanceTravl);
 		double velBullet = 20 - 3 * power;
-		double limit = distance / velBullet + 2;
+		double limit = distance / velBullet;
 		debug(String.valueOf((int)limit));
+		Point newPosEnemy = pointFromCoordinates(0, 0);
+		double angle = 0;
 		for (int t=1; t<=(int)limit; t++) {
-			Point newPosEnemy = add(posEnemy, enemyDistanceTravl);/* Richtung beachten */
-			double angle = preaimAngle(posEnemy, newPosEnemy);
+			newPosEnemy = add(posEnemy, enemyDistanceTravl);/* Richtung beachten */
 			//Point posBullet = multiply(add(getPoint(), velBullet), t); /* Richtung beachten */
 			// hitbox nachgucken
-			turnGun(angle);
+			angle = preaimAngle(posEnemy, newPosEnemy);
 			posEnemy = newPosEnemy;
+
 			/*
 			if ((newPosEnemy - radius_hitbox) <= newPosBullet && newPosBullet <= (newPosEnemy + radius_hitbox)) {
 				fireBullet(power);
 			}
 			 */
 		}
+		Point relative = subtract(newPosEnemy, getPoint());
+		double length = length(relative);
+		double newTicks = length / velBullet;
+		double newLimit = newTicks - limit;
+
+		for (int t = 0; t <= (int)newLimit; t++) {
+			newPosEnemy = add(posEnemy, enemyDistanceTravl);
+			angle = preaimAngle(posEnemy, newPosEnemy);
+			posEnemy = newPosEnemy;
+		}
+		//debug(String.valueOf(length));
+		//debug(String.valueOf(newLimit));
+		turnGun(angle);
 	}
 
 	void circle(double distance) {
