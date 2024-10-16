@@ -27,13 +27,14 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	double width;
 	double gunTurn;
 	List <Point> lastandcurrentpos = createEmptyList();
-	//List count = createEmptyList();
 	//java.awt.Graphics2D canvas = getGraphics();
-	Point newPoint = new Point(width/2, height/2);
 	boolean neg = false;
 	double cooldown = 0;
 	double velocity = 0;
 	double bearing = 0;
+	int direction = 1;
+	int turnDirection = 1;
+	ScannedRobotEvent ev = null;
 
 	@Override
 	public void start() {
@@ -54,7 +55,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 	void execute() {
 		gunHeat = getGunHeat();
 		if (hasScannedRobot()) {
-			ScannedRobotEvent ev = getScannedRobotEvent();
+			ev = getScannedRobotEvent();
 			distance = getDistance(ev);
 			velocity = Wrappers.getVelocity(ev);
 			bearing = getBearing(ev);
@@ -74,15 +75,9 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		} else {
 			turnRadar(-360);
 		}
-		//Point lastdistance = subtract(getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
-		//double power = 2;
-		//aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
-		//debug("-------preaim--------");
-		//debug(String.valueOf(adjust));
-		//debug("---------------------");
 		double power = 0;
 		//turnGun(adjust);
-		circle(distance);
+		movement(distance);
 		if (distance <= 200) {
 			power = 3;
 		} else if (distance > 200 && distance <= 400) {
@@ -95,7 +90,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		//dreieck(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		fireBullet(power);
-		//debug("["+getFirst(lastandcurrentpos)+", "+getLast(lastandcurrentpos)+"]");
 	}
 
 	double preaimAngle(Point current, Point distance) {
@@ -161,7 +155,8 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		turnGun(angle);
 	}
 
-	void circle(double distance) {
+	void movement(double distance) {
+		Point middle = new Point(width/2, height/2);
 		int dist = 20;
 		int deg = 50;
 		double limit = 100;
@@ -174,22 +169,34 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			ahead(-200);
 			neg = true;
 			cooldown = getTime() + 5;
-			debug("cooldown:"+String.valueOf(cooldown));
 		} else if (width - X <= limit || X <= limit) {
 			ahead(-200);
 			neg = true;
 			cooldown = getTime() + 5;
-			debug("cooldown: "+String.valueOf(cooldown));
 		}
 		if (neg && getTime() <= cooldown) {
-			turn(deg+20);
-			ahead(-dist);
+			/*if (angleBetween(middle, getPoint()) != getHeading()) {
+				debug(String.valueOf(angleBetween(middle, getPoint())));
+				turn(angleBetween(middle, getPoint())); //muss sich zur mitte der map drehen
+			}*/
+			ahead(direction * -20);
 			if (getTime() == cooldown) {
 				neg = false;
 			}
 		} else {
-			turn(deg);
-			ahead(dist);
+			turn(normalRelativeAngle(bearing - 90) * turnDirection);
+			ahead(direction * 20);
+		}
+		/*
+		if (velocity == 0) {
+			turn(bearing + 90);
+		}
+		*/
+		if (getTime() % 30 == 0) {
+			direction *= -1;
+		}
+		if (getTime() % 50 == 0) {
+			turnDirection *= -1;
 		}
 	}
 }
