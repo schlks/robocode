@@ -169,42 +169,18 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		//debug(String.valueOf(Y));
 
 		if (height - Y <= limit || Y <= limit) {
-			//ahead(-200);
-			//neg = true;
-			//cooldown = getTime() + 10;
 		} else if (width - X <= limit || X <= limit) {
-			//ahead(-200);
-			//neg = true;
-			//cooldown = getTime() + 10;
 		}
-		if (neg && getTime() <= cooldown) {
-			/*if (angleBetween(middle, getPoint()) != getHeading()) {
-				debug(String.valueOf(angleBetween(middle, getPoint())));
-				turn(angleBetween(middle, getPoint())); //muss sich zur mitte der map drehen
-			}*/
-			//ahead(direction * -20);
-			//turn(normalRelativeAngle(bearing - 90) * -1);
-
-			goTo(middle);
-			ahead(20);
-			if (getTime() == cooldown) {
-				neg = false;
-				//direction *= -1;
-				//turnDirection *= -1;
-			}
-		} else {
-			if (distance > 300) {
-				b = 50;
-			} else if (distance < 300) {
-				b = -50;
-			}
-			//if (hasHitWall()) {
-			//	direction *= -1;
-			//}
-			debug(String.valueOf(direction));
-			turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
-			ahead(direction * 20);
+		if (distance > 300) {
+			b = 50;
+		} else if (distance < 300) {
+			b = -50;
 		}
+		//if (hasHitWall()) {
+		//	direction *= -1;
+		//}
+		turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
+		ahead(direction * 20);
 
 		if (velocity == 0) {
 			turn(bearing + 90);
