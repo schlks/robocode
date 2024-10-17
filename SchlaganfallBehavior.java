@@ -1,20 +1,20 @@
 package infovk.l_schepp24;
 
+import java.awt.*;
 import java.util.List;
-import java.util.Timer;
 
 import static infovk.l_schepp24.Wrappers.*;
 import static infovk.l_schepp24.Utils.*;
 import static java.awt.Color.*;
 
-public class MyFirstBehavior extends SimpleRobotBehavior {
+public class SchlaganfallBehavior extends SimpleRobotBehavior {
 	//Ged�chtnissektion
 
 	public void debug(String str) {
 		System.out.println(str);
 	}
 
-	public MyFirstBehavior(SimpleRobot  robot) {
+	public SchlaganfallBehavior(SimpleRobot  robot) {
 		super(robot);
 	}
 
@@ -49,6 +49,8 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		debug("Width:  " + String.valueOf(width));
 		debug("-------------------");
 		turnRadar(720);
+		Color color = MAGENTA;
+		setColors(color, color, color, color, color);
 	}
 
 	@Override
@@ -90,7 +92,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		if (getVelocity() != 0) {
 			aimbot(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		}
-		//dreieck(power, getLast(lastandcurrentpos), getFirst(lastandcurrentpos));
 		fireBullet(power);
 	}
 
@@ -112,18 +113,6 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		return angle;
 	}
 
-	double dreieck(double power, Point posEnemy, Point lastPosEnemy) {
-		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
-		double velBullet = 20 - 3 * power;
-		double ticksToEnemy = distance / velBullet;
-		Point newPosEnemy = add(posEnemy, multiply(enemyDistanceTravl, ticksToEnemy));
-		double angle = preaimAngle(posEnemy, newPosEnemy);
-		turnGun(angle);
-		//debug(String.valueOf(angle));
-		return angle;
-	}
-
-	// noch absolut gar nicht richtig aber wir haben schon einen weg dahin
 	void aimbot(double power, Point posEnemy, Point lastPosEnemy) {
 		Point enemyDistanceTravl = subtract(posEnemy, lastPosEnemy);
 		double velEnemy = length(enemyDistanceTravl);
@@ -161,35 +150,48 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		Point middle = new Point(width/2, height/2);
 		int dist = 20;
 		int deg = 50;
-		double limit = 150;
+		double limit = 100;
 		double X = getX();
 		double Y = getY();
 		double b = 1;
+		double c = 10;
 		//debug(String.valueOf(X));
 		//debug(String.valueOf(Y));
 
 		if (height - Y <= limit || Y <= limit) {
+			cooldown = getTime() + c;
+			ahead(direction * -20);
+			neg = true;
 		} else if (width - X <= limit || X <= limit) {
+			cooldown = getTime() + c;
+			ahead(direction * -20);
+			neg = true;
 		}
-		if (distance > 300) {
-			b = 50;
-		} else if (distance < 300) {
-			b = -50;
+		if (neg && getTime() <= cooldown || hasHitWall()) {
+			goTo(middle);
+		} else if (neg && cooldown == getTime()) {
+			direction *= -1;
+			neg = false;
+		} else {
+			if (distance > 200) {
+				b = 50;
+			} else if (distance < 200) {
+				b = -50;
+			}
+			if (hasHitWall()) {
+				direction *= -1;
+			}
+			turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
+			ahead(direction * 20);
 		}
-		//if (hasHitWall()) {
-		//	direction *= -1;
-		//}
-		turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
-		ahead(direction * 20);
-
 		if (velocity == 0) {
 			turn(bearing + 90);
 			if (getTime() % 40 == 0) {
 				direction *= -1;
 			}
 		}
-
 	}
+
 	void goTo(Point gotoPoint) {
 		Point us = getPoint();
 		Point toPoint = subtract(gotoPoint, us);
