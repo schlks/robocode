@@ -161,7 +161,7 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 		Point middle = new Point(width/2, height/2);
 		int dist = 20;
 		int deg = 50;
-		double limit = 100;
+		double limit = 150;
 		double X = getX();
 		double Y = getY();
 		double b = 1;
@@ -170,24 +170,26 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 
 		if (height - Y <= limit || Y <= limit) {
 			//ahead(-200);
-			neg = true;
-			cooldown = getTime() + 7;
+			//neg = true;
+			//cooldown = getTime() + 10;
 		} else if (width - X <= limit || X <= limit) {
 			//ahead(-200);
-			neg = true;
-			cooldown = getTime() + 7;
+			//neg = true;
+			//cooldown = getTime() + 10;
 		}
 		if (neg && getTime() <= cooldown) {
 			/*if (angleBetween(middle, getPoint()) != getHeading()) {
 				debug(String.valueOf(angleBetween(middle, getPoint())));
 				turn(angleBetween(middle, getPoint())); //muss sich zur mitte der map drehen
 			}*/
-			ahead(direction * -10);
+			//ahead(direction * -20);
 			//turn(normalRelativeAngle(bearing - 90) * -1);
 
+			goTo(middle);
+			ahead(20);
 			if (getTime() == cooldown) {
 				neg = false;
-				direction *= -1;
+				//direction *= -1;
 				//turnDirection *= -1;
 			}
 		} else {
@@ -196,9 +198,9 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 			} else if (distance < 300) {
 				b = -50;
 			}
-			if (hasHitWall()) {
-				direction *= -1;
-			}
+			//if (hasHitWall()) {
+			//	direction *= -1;
+			//}
 			debug(String.valueOf(direction));
 			turn(normalRelativeAngle(bearing - 90) * turnDirection + b);
 			ahead(direction * 20);
@@ -206,10 +208,17 @@ public class MyFirstBehavior extends SimpleRobotBehavior {
 
 		if (velocity == 0) {
 			turn(bearing + 90);
-			if (getTime() % 30 == 0) {
+			if (getTime() % 40 == 0) {
 				direction *= -1;
 			}
 		}
 
+	}
+	void goTo(Point gotoPoint) {
+		Point us = getPoint();
+		Point toPoint = subtract(gotoPoint, us);
+		double angle = angle(toPoint);
+		turn(normalRelativeAngle(angle - getHeading()));
+		ahead(20);
 	}
 }
